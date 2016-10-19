@@ -1,0 +1,27 @@
+WeChatTicket:
+  image: xujingao13/WeChatTicket:2.0
+  environment:
+    - PRODUCTION=True
+  links:
+    - wxt_db
+  volumes:
+    - ./static:/usr/src/app/WeChatTicket/static
+  privileged: true
+  restart: always
+wxt_db:
+  image: mysql/mysql-server:5.7
+  volumes:
+    - ./datadir:/var/lib/mysql
+    - ./my.cnf:/etc/my.cnf
+  restart: always
+wxt_web:
+  image: nginx:1.9.8
+  volumes:
+    - ./uwsgi_params:/etc/nginx/conf.d/uwsgi_params:ro
+    - ./WeChatTicket.conf:/etc/nginx/conf.d/default.conf:ro
+    - ./static:/usr/share/nginx/static:ro
+  links:
+    - WeChatTicket
+  ports:
+    - "4705:80"
+  restart: always
